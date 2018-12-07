@@ -1,0 +1,79 @@
+{
+	"id": "49e5fecd-8fbd-4be4-8c8d-31d031406796",
+	"name": "trackit-test-env",
+	"values": [
+		{
+			"key": "apiUrl",
+			"value": "<api_url>",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			},
+			"enabled": true
+		},
+		{
+			"key": "username",
+			"value": "<username>",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			},
+			"enabled": true
+		},
+		{
+			"key": "password",
+			"value": "<password>",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			},
+			"enabled": true
+		},
+		{
+			"key": "tagKey",
+			"value": "<tagKey>",
+			"description": {
+				"content": "Name",
+				"type": "text/plain"
+			},
+			"enabled": true
+		},
+		{
+			"key": "shortResponseTime",
+			"value": "<rt>",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			},
+			"enabled": true
+		},
+		{
+			"key": "token",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "endDate",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "longBeginDate",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "shortBeginDate",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "thisMonthDate",
+			"value": "",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2018-12-06T15:55:01.924Z",
+	"_postman_exported_using": "Postman/6.5.3"
+}

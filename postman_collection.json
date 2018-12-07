@@ -1,0 +1,887 @@
+{
+	"info": {
+		"_postman_id": "90003995-ee2f-434e-9ba9-0c3a0edddab8",
+		"name": "trackit-test",
+		"description": "This is the testing suite for trackit API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "success_tests",
+			"item": [
+				{
+					"name": "/user/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"exec": [
+									"function setEnvForTest(token) {",
+									"    var moment = require('moment');",
+									"    // Saving token for future requests",
+									"    pm.environment.set(\"token\", token);",
+									"    // Setting dates for future requests",
+									"    var shortBeginDate = moment().subtract(1, 'month');",
+									"    shortBeginDate.date(1);",
+									"    var longBeginDate = moment().subtract(4, 'month');",
+									"    longBeginDate.date(1);",
+									"    var endDate = moment().subtract(1, 'month').endOf('month');",
+									"    var thisMonthDate = moment();",
+									"    thisMonthDate.date(1);",
+									"",
+									"    pm.environment.set(\"shortBeginDate\", shortBeginDate.format('YYYY-MM-DD'));",
+									"    pm.environment.set(\"longBeginDate\", longBeginDate.format('YYYY-MM-DD'));",
+									"    pm.environment.set(\"endDate\", endDate.format('YYYY-MM-DD'));",
+									"    pm.environment.set(\"thisMonthDate\", thisMonthDate.format('YYYY-MM-DD'));",
+									"}",
+									"",
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response should contain user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.user).to.not.be.undefined;",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"    pm.expect(jsonData.user).to.have.property('email');",
+									"",
+									"});",
+									"",
+									"pm.test(\"response should have a valid token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token.length).to.be.gt(200);",
+									"    setEnvForTest(jsonData.token)",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"{{username}}\",\n\t\"password\":\"{{password}}\",\n\t\"awsToken\":null\n}"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/login",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/aws/status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "15c24abe-c3a8-4426-85d3-c2c3e93dad78",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response returns trackit AWS account\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.gt(0);",
+									"    pm.expect(jsonData[0].pretty).to.eql('TrackIt');",
+									"});",
+									"",
+									"pm.test(\"trackit AWS account has a bill repository\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].billRepositories).lengthOf(1);",
+									"});",
+									"",
+									"pm.test(\"trackit AWS account bill repository is valid\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var repo = jsonData[0].billRepositories[0];",
+									"    pm.expect(repo.error.length).to.eql(0);",
+									"    pm.expect(repo.status.value).to.eql(\"ok\");",
+									"});",
+									"",
+									"pm.test(\"trackit AWS account returns sub accounts\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].subAccounts.length).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"trackit AWS account sub accounts have names\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].subAccounts[0].pretty.length).to.be.gt(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/aws/status",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"aws",
+								"status"
+							]
+						},
+						"description": "List AWS accounts and their statuses."
+					},
+					"response": []
+				},
+				{
+					"name": "/costs by=month",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "90f222c7-c6b1-423c-9973-6813a778e353",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"month value is present\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.month).to.exist;",
+									"});",
+									"",
+									"pm.test(\"response contains a value for the last 4 months\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(Object.keys(jsonData.month)).to.have.lengthOf(4);",
+									"});",
+									"",
+									"pm.test(\"response contains no $0 total over the last 4 months\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var months = jsonData.month;",
+									"    for (var month in months) {",
+									"        if(months.hasOwnProperty(month)) {",
+									"            pm.expect(months[month]).to.not.eql(0);",
+									"        }",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/costs?begin={{longBeginDate}}&end={{endDate}}&by=month",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"costs"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{longBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								},
+								{
+									"key": "by",
+									"value": "month"
+								}
+							]
+						},
+						"description": "Get costs by month"
+					},
+					"response": []
+				},
+				{
+					"name": "/costs/tags/keys",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "da48eab8-af1e-4d48-b4de-d626daf20ca6",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains tags keys\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});",
+									"",
+									"pm.test(\"response contains key for future calls\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var key = pm.environment.get(\"tagKey\");",
+									"    pm.expect(jsonData.indexOf(key)).to.not.eql(-1);",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/costs/tags/keys?begin={{longBeginDate}}&end={{endDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"costs",
+								"tags",
+								"keys"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{longBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								}
+							]
+						},
+						"description": "Get tags keys"
+					},
+					"response": []
+				},
+				{
+					"name": "/costs/tags/values",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aad19af9-e492-4e52-ace4-96820f934163",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"tag key value is present\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var key = pm.environment.get(\"tagKey\");",
+									"    pm.expect(jsonData[key]).to.exist;",
+									"});",
+									"",
+									"pm.test(\"response contains values for the specified key\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var key = pm.environment.get(\"tagKey\");",
+									"    pm.expect(jsonData[key]).to.have.lengthOf.above(0);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/costs/tags/values?begin={{longBeginDate}}&end={{endDate}}&keys={{tagKey}}&by=month",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"costs",
+								"tags",
+								"values"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{longBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								},
+								{
+									"key": "keys",
+									"value": "{{tagKey}}"
+								},
+								{
+									"key": "by",
+									"value": "month"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/costs/anomalies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9a27cf21-780d-4d57-976f-7cbe18b3a574",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response does not contain an error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/costs/anomalies?begin={{shortBeginDate}}&end={{endDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"costs",
+								"anomalies"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{shortBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/ec2/unused",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9a27cf21-780d-4d57-976f-7cbe18b3a574",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response does not contain an error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/ec2/unused?date={{thisMonthDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"ec2",
+								"unused"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{thisMonthDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/ec2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains data and no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/ec2?date={{shortBeginDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"ec2"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{shortBeginDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/rds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains data and no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/rds?date={{shortBeginDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"rds"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{shortBeginDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/es",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains data and no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/es?date={{shortBeginDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"es"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{shortBeginDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d930ecff-63f1-48b8-86c4-995a8b56a2aa",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d9fc402e-b79e-407a-8657-fe1cb66d4224",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "no_auth_tests",
+			"item": [
+				{
+					"name": "NOAUTH /user/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"exec": [
+									"pm.test(\"response should not contain user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.user).to.be.undefined;",
+									"",
+									"});",
+									"",
+									"pm.test(\"response should not have a valid token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.be.undefined;",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"badUsername\",\n\t\"password\":\"badPassword\",\n\t\"awsToken\":null\n}"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/login",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOAUTH /aws/status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"exec": [
+									"pm.test(\"response does not return trackit AWS account\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.not.exist;",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/aws/status",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"aws",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOAUTH /costs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"exec": [
+									"pm.test(\"response does not return costs to non-authenticated user\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.not.exist;",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/costs?begin={{longBeginDate}}&end={{endDate}}&by=month",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"costs"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{longBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								},
+								{
+									"key": "by",
+									"value": "month"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "These tests make sure that the endpoints are not returning data to non authenticated users.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5e189a59-0d07-4c5d-b48a-81afd5d1dcb0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4577775b-c14a-4e41-b450-2bb2dc726526",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok (forbidden)\", function () {",
+							"    pm.expect(pm.response.code).to.be.within(401, 403);",
+							"});",
+							"",
+							"pm.test(\"response time is correct\", function () {",
+							"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+							"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "trackit-api-tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@slack/client": "^4.8.0",
+    "newman": "^4.2.2",
+    "replace": "^1.0.0"
+  }
+}
