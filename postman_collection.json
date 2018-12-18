@@ -657,6 +657,163 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "/elasticache",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/elasticache?date={{shortBeginDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"elasticache"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{shortBeginDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/plugins/results",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f223f87-1de6-4dc3-9480-75baf41a1c19",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains data and no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/plugins/results",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"plugins",
+								"results"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/s3/costs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "77cbcc34-0215-4521-bf18-68aa8a0b1960",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains data and no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"    pm.expect(Object.keys(jsonData)).to.have.lengthOf.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/s3/costs?begin={{shortBeginDate}}&end={{endDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"s3",
+								"costs"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{shortBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
