@@ -1,0 +1,9 @@
+version: 2
+jobs:
+ build:
+   machine: true
+   steps:
+     - checkout
+     - run: |
+         docker build -t trackit-api-tests .
+         docker run -e TRACKIT_API_URL=$TRACKIT_API_URL -e TRACKIT_USERNAME=$TRACKIT_USERNAME -e TRACKIT_PASSWORD=$TRACKIT_PASSWORD -e TRACKIT_RT=10000 -e SLACK_CHANNEL=$SLACK_CHANNEL_TEST -e SLACK_TOKEN=$SLACK_TOKEN_TEST trackit-api-tests
