@@ -659,6 +659,60 @@
 					"response": []
 				},
 				{
+					"name": "/lambda",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains data and no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.not.exist;",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/lambda?date={{thisMonthDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"lambda"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{thisMonthDate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "/elasticache",
 					"event": [
 						{
