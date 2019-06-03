@@ -695,7 +695,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{apiUrl}}/lambda?date={{thisMonthDate}}",
+							"raw": "{{apiUrl}}/lambda?date={{shortBeginDate}}",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -705,7 +705,7 @@
 							"query": [
 								{
 									"key": "date",
-									"value": "{{thisMonthDate}}"
+									"value": "{{shortBeginDate}}"
 								}
 							]
 						}
