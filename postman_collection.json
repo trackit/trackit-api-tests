@@ -121,7 +121,7 @@
 									"",
 									"pm.test(\"trackit AWS account returns sub accounts\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData[0].subAccounts.length).to.eql(1);",
+									"    pm.expect(jsonData[0].subAccounts.length).to.be.gt(0);",
 									"});",
 									"",
 									"pm.test(\"trackit AWS account sub accounts have names\", function () {",
@@ -351,7 +351,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{apiUrl}}/costs/tags/values?begin={{longBeginDate}}&end={{endDate}}&keys={{tagKey}}&by=month",
+							"raw": "{{apiUrl}}/costs/tags/values?begin={{longBeginDate}}&end={{endDate}}&keys={{tagKey}}&by=month&detailed=false",
 							"host": [
 								"{{apiUrl}}"
 							],
