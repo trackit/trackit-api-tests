@@ -376,6 +376,10 @@
 								{
 									"key": "by",
 									"value": "month"
+								},
+								{
+									"key": "detailed",
+									"value": "false"
 								}
 							]
 						}
