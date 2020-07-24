@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "90003995-ee2f-434e-9ba9-0c3a0edddab8",
+		"_postman_id": "897f581f-ea69-4549-a486-2f6582376573",
 		"name": "trackit-test",
 		"description": "This is the testing suite for trackit API.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -15,7 +15,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"id": "cd5690f5-34bb-4e1b-be77-29d67eb96f3f",
 								"exec": [
 									"function setEnvForTest(token) {",
 									"    var moment = require('moment');",
@@ -94,7 +94,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "15c24abe-c3a8-4426-85d3-c2c3e93dad78",
+								"id": "06e6b29e-1bc5-421a-9a86-c3d305236757",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -142,10 +142,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/aws/status",
 							"host": [
@@ -166,7 +162,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "90f222c7-c6b1-423c-9973-6813a778e353",
+								"id": "8ea60e24-98b7-43be-b7f9-fe3a6ea30d24",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -207,10 +203,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/costs?begin={{longBeginDate}}&end={{endDate}}&by=month",
 							"host": [
@@ -239,12 +231,209 @@
 					"response": []
 				},
 				{
+					"name": "/tagging/compliance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8566542c-836a-4916-bc37-569f9fc58da1",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains at least one value\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(Object.keys(jsonData)).to.have.lengthOf.above(0);",
+									"});",
+									"",
+									"pm.test(\"response contains most used tags ids\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    Object.keys(jsonData).forEach((key) => {",
+									"        pm.expect(jsonData[key].mostUsedTagsId).to.not.be.an('undefined');",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"response contains numbers that sums up\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    Object.keys(jsonData).forEach((key) => {",
+									"        const calculatedTotal = jsonData[key].totallyTagged + jsonData[key].partiallyTagged + jsonData[key].notTagged;",
+									"        pm.expect(jsonData[key].total).to.equal(calculatedTotal);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/tagging/compliance?begin={{longBeginDate}}&end={{endDate}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"tagging",
+								"compliance"
+							],
+							"query": [
+								{
+									"key": "begin",
+									"value": "{{longBeginDate}}"
+								},
+								{
+									"key": "end",
+									"value": "{{endDate}}"
+								}
+							]
+						},
+						"description": "Get compliance data"
+					},
+					"response": []
+				},
+				{
+					"name": "/tagging/mostusedtags",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d60444fe-e32e-4cf0-ad04-aed29473aa97",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"reportDate value is present\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.reportDate).to.exist;",
+									"});",
+									"",
+									"pm.test(\"response contains at least one tag\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.mostUsedTags).to.have.lengthOf.above(0);",
+									"});",
+									"",
+									"pm.test(\"response contains five tags\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.mostUsedTags).to.have.lengthOf(5);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/tagging/mostusedtags",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"tagging",
+								"mostusedtags"
+							]
+						},
+						"description": "Get latest most used tags"
+					},
+					"response": []
+				},
+				{
+					"name": "/tagging/resources",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "69590933-2a7d-400e-b50c-556e836d4134",
+								"exec": [
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response contains at least one resource\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.lengthOf.above(0);",
+									"});",
+									"",
+									"pm.test(\"response contains only one report date\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var reportDate = null;",
+									"",
+									"    jsonData.forEach((resource) => {",
+									"        if (reportDate == null)",
+									"            reportDate = resource.reportDate;",
+									"        pm.expect(reportDate).to.equal(resource.reportDate);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"response contains only complete data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    jsonData.forEach((resource) => {",
+									"        pm.expect(resource.account).to.have.lengthOf.above(0);",
+									"        pm.expect(resource.reportDate).to.have.lengthOf.above(0);",
+									"        pm.expect(resource.resourceId).to.have.lengthOf.above(0);",
+									"        pm.expect(resource.resourceType).to.have.lengthOf.above(0);",
+									"        pm.expect(resource.region).to.have.lengthOf.above(0);",
+									"        pm.expect(resource.url).to.have.lengthOf.above(0);",
+									"    });",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/tagging/resources",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"tagging",
+								"resources"
+							]
+						},
+						"description": "Get resources list of the latest tagging report"
+					},
+					"response": []
+				},
+				{
 					"name": "/costs/tags/keys",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "da48eab8-af1e-4d48-b4de-d626daf20ca6",
+								"id": "86ffe3b1-3821-45a7-a52a-5e56eb630991",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -278,10 +467,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/costs/tags/keys?begin={{longBeginDate}}&end={{endDate}}",
 							"host": [
@@ -313,7 +498,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "aad19af9-e492-4e52-ace4-96820f934163",
+								"id": "438f250c-d6bb-48e9-af28-55326106aa45",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -346,10 +531,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/costs/tags/values?begin={{longBeginDate}}&end={{endDate}}&keys={{tagKey}}&by=month&detailed=false",
 							"host": [
@@ -392,7 +573,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "9a27cf21-780d-4d57-976f-7cbe18b3a574",
+								"id": "27549167-9a7a-4934-90e8-c7256cde6c9e",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -418,10 +599,6 @@
 								"value": "{{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/costs/anomalies?begin={{shortBeginDate}}&end={{endDate}}",
 							"host": [
@@ -451,7 +628,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "9a27cf21-780d-4d57-976f-7cbe18b3a574",
+								"id": "532643ad-e504-4e3b-9aad-c4cc7f2c553a",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -477,10 +654,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/ec2/unused?date={{thisMonthDate}}",
 							"host": [
@@ -506,7 +679,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"id": "27e4120b-b9a6-4337-9779-a8fc63e532a1",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -532,10 +705,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/ec2?date={{shortBeginDate}}",
 							"host": [
@@ -560,7 +729,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"id": "452fcd68-86ca-4d54-aa2d-2ca397a9c70f",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -586,10 +755,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/rds?date={{shortBeginDate}}",
 							"host": [
@@ -614,7 +779,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"id": "6a7ca03a-c72d-46b0-8d5d-25636a0fed5b",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -640,10 +805,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/es?date={{shortBeginDate}}",
 							"host": [
@@ -668,7 +829,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"id": "656a58f9-388b-482f-944a-fd0f63c67972",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -694,10 +855,6 @@
 								"value": "{{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/lambda?date={{shortBeginDate}}",
 							"host": [
@@ -722,7 +879,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5aca5935-7152-470a-81f2-8e9a5666bd2f",
+								"id": "52a3b005-17a0-4a11-b5b2-5096186ec2db",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -743,10 +900,6 @@
 								"value": "{{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/elasticache?date={{shortBeginDate}}",
 							"host": [
@@ -771,7 +924,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7f223f87-1de6-4dc3-9480-75baf41a1c19",
+								"id": "5e48e1b4-97dd-4db8-93e7-5193cae43e6b",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -797,10 +950,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/plugins/results",
 							"host": [
@@ -820,7 +969,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "77cbcc34-0215-4521-bf18-68aa8a0b1960",
+								"id": "5e5eb8d3-6493-4fa1-a522-0902f972e7c8",
 								"exec": [
 									"pm.test(\"response time is correct\", function () {",
 									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
@@ -846,10 +995,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{apiUrl}}/s3/costs?begin={{shortBeginDate}}&end={{endDate}}",
 							"host": [
@@ -878,7 +1023,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d930ecff-63f1-48b8-86c4-995a8b56a2aa",
+						"id": "55e79794-2381-420e-a3a9-80f60b02979f",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -888,7 +1033,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d9fc402e-b79e-407a-8657-fe1cb66d4224",
+						"id": "239a6baf-f4ea-4d4b-951f-89e2b6c7c292",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"response code is 200 OK\", function () {",
@@ -897,7 +1042,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "no_auth_tests",
@@ -908,7 +1054,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"id": "d44a4c6b-5ab8-4028-8f5b-3bcd2faa963f",
 								"exec": [
 									"pm.test(\"response should not contain user data\", function () {",
 									"    var jsonData = pm.response.json();",
@@ -960,7 +1106,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"id": "d894b256-b2a4-4474-8131-e740b9b8c09b",
 								"exec": [
 									"pm.test(\"response does not return trackit AWS account\", function () {",
 									"    var jsonData = pm.response.json();",
@@ -1009,7 +1155,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "94171ee3-0932-4903-9f46-4c46e24f39bd",
+								"id": "6a3f36df-eee8-44e7-a899-3effd2c6cb9f",
 								"exec": [
 									"pm.test(\"response does not return costs to non-authenticated user\", function () {",
 									"    var jsonData = pm.response.json();",
@@ -1071,7 +1217,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "5e189a59-0d07-4c5d-b48a-81afd5d1dcb0",
+						"id": "ad13040c-1186-47e4-a708-f8949c742761",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1081,7 +1227,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4577775b-c14a-4e41-b450-2bb2dc726526",
+						"id": "52443305-7289-4ce1-a8c0-67b54e6409f8",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"response is ok (forbidden)\", function () {",
@@ -1096,7 +1242,9 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
