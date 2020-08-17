@@ -405,7 +405,7 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Authorization",
@@ -413,6 +413,15 @@
 								"value": "{{token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accounts\": [],\n    \"regions\": [],\n    \"resourceTypes\": [],\n    \"tags\": [],\n    \"missingTags\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{apiUrl}}/tagging/resources",
 							"host": [
