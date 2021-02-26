@@ -73,7 +73,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\":\"{{username}}\",\n\t\"password\":\"{{password}}\",\n\t\"awsToken\":null\n}"
+							"raw": "{\n\t\"email\":\"{{username}}\",\n\t\"password\":\"{{password}}\",\n\t\"awsToken\":null,\n\t\"origin\":\"trackit\"\n}"
 						},
 						"url": {
 							"raw": "{{apiUrl}}/user/login",
@@ -1094,7 +1094,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\":\"badUsername\",\n\t\"password\":\"badPassword\",\n\t\"awsToken\":null\n}"
+							"raw": "{\n\t\"email\":\"badUsername\",\n\t\"password\":\"badPassword\",\n\t\"awsToken\":null,\n\t\"origin\":\"trackit\"\n}"
 						},
 						"url": {
 							"raw": "{{apiUrl}}/user/login",
