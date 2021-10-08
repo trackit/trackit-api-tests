@@ -89,6 +89,84 @@
 					"response": []
 				},
 				{
+					"name": "/user/login tagbot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function setEnvForTest(token) {",
+									"    var moment = require('moment');",
+									"    // Saving token for future requests",
+									"    pm.environment.set(\"tagbotToken\", token);",
+									"    // Setting dates for future requests",
+									"    var shortBeginDate = moment().subtract(1, 'month');",
+									"    shortBeginDate.date(1);",
+									"    var longBeginDate = moment().subtract(4, 'month');",
+									"    longBeginDate.date(1);",
+									"    var endDate = moment().subtract(1, 'month').endOf('month');",
+									"    var thisMonthDate = moment();",
+									"    thisMonthDate.date(1);",
+									"",
+									"    pm.environment.set(\"shortBeginDate\", shortBeginDate.format('YYYY-MM-DD'));",
+									"    pm.environment.set(\"longBeginDate\", longBeginDate.format('YYYY-MM-DD'));",
+									"    pm.environment.set(\"endDate\", endDate.format('YYYY-MM-DD'));",
+									"    pm.environment.set(\"thisMonthDate\", thisMonthDate.format('YYYY-MM-DD'));",
+									"}",
+									"",
+									"pm.test(\"response time is correct\", function () {",
+									"    var responseTime = parseInt(pm.environment.get(\"shortResponseTime\"));",
+									"    pm.expect(pm.response.responseTime).to.be.below(responseTime);",
+									"});",
+									"",
+									"pm.test(\"response should contain user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.user).to.not.be.undefined;",
+									"    pm.expect(jsonData.user).to.have.property('id');",
+									"    pm.expect(jsonData.user).to.have.property('email');",
+									"",
+									"});",
+									"",
+									"pm.test(\"response should have a valid token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token.length).to.be.gt(200);",
+									"    setEnvForTest(jsonData.token)",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"{{username}}\",\n\t\"password\":\"{{password}}\",\n\t\"awsToken\":null,\n\t\"origin\":\"tagbot\"\n}"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/login",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "/aws/status",
 					"event": [
 						{
@@ -274,7 +352,7 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "{{token}}"
+								"value": "{{tagbotToken}}"
 							}
 						],
 						"url": {
@@ -340,7 +418,7 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "{{token}}"
+								"value": "{{tagbotToken}}"
 							}
 						],
 						"url": {
@@ -410,7 +488,7 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "{{token}}"
+								"value": "{{tagbotToken}}"
 							}
 						],
 						"body": {
