@@ -472,7 +472,7 @@
 									"        pm.expect(resource.reportDate).to.have.lengthOf.above(0);",
 									"        pm.expect(resource.resourceId).to.have.lengthOf.above(0);",
 									"        pm.expect(resource.resourceType).to.have.lengthOf.above(0);",
-									"        pm.expect(resource.region).to.have.lengthOf.above(0);",
+									"        if (resource.resourceType != \"route53\") pm.expect(resource.region).to.have.lengthOf.above(0);",
 									"        pm.expect(resource.url).to.have.lengthOf.above(0);",
 									"    });",
 									"});",
